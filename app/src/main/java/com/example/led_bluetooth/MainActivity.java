@@ -13,6 +13,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.SeekBar;
 import android.widget.Spinner;
@@ -38,14 +39,18 @@ public class MainActivity extends AppCompatActivity {
     private Set<BluetoothDevice> pairedDevices;
     private BluetoothSocket bluetoothSocket;
     private OutputStream outputStream;
-    private TextView tvState;
+    private TextView tvState, tvSpeed, tvBrightness;
     private Spinner modeLed;
+    private LinearLayout speedLinear;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         tvState = findViewById(R.id.tvState);
+        speedLinear = findViewById(R.id.speedLinear);
+        tvSpeed = findViewById(R.id.tvSpeed);
+        tvBrightness = findViewById(R.id.tvBrightness);
 
         bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         if (bluetoothAdapter == null) {
@@ -58,6 +63,7 @@ public class MainActivity extends AppCompatActivity {
         Button btnScan = findViewById(R.id.btnScan);
         ListView listViewDevices = findViewById(R.id.listViewDevices);
         SeekBar seekBarBrightness = findViewById(R.id.seekBarBrightness);
+        SeekBar seekBarSpeed = findViewById(R.id.seekBarSpeed);
         modeLed = findViewById(R.id.modeSpinner);
         initSpinner();
 
@@ -65,6 +71,11 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 try {
+                    if(position == 6 || position == 7 || position == 11 || position == 12 || position == 20 || position == 23 || position == 27 || position == 28 || position == 29 ||position == 30 || position == 32 )
+                        speedLinear.setVisibility(View.VISIBLE);
+                    else
+                        speedLinear.setVisibility(View.GONE);
+
                     sendCommand("!m=" + (position + 2) + ";");
                 }
                 catch (Exception exception){
@@ -81,6 +92,7 @@ public class MainActivity extends AppCompatActivity {
                         "Подтверждение",
                         "Разорвать соединение с устройством?");
             } else {
+                tvState.setText("отключено");
                 Toast.makeText(MainActivity.this,
                         "Нет активного соединения",
                         Toast.LENGTH_SHORT).show();
@@ -113,16 +125,35 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        seekBarSpeed.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                tvSpeed.setText(String.valueOf(seekBar.getProgress()));
+            }
 
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+                sendCommand("!s=" + seekBar.getProgress() + ";");
+
+            }
+        });
         seekBarBrightness.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
-            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {}
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {tvBrightness.setText(String.valueOf(seekBar.getProgress()));}
 
             @Override
             public void onStartTrackingTouch(SeekBar seekBar) {}
 
             @Override
-            public void onStopTrackingTouch(SeekBar seekBar) {sendCommand("!b=" + seekBar.getProgress() + ";");}
+            public void onStopTrackingTouch(SeekBar seekBar) {
+                sendCommand("!b=" + seekBar.getProgress() + ";");
+
+            }
         });
 
 
@@ -204,43 +235,29 @@ public class MainActivity extends AppCompatActivity {
                 "Мигалки (на половину)",
                 "Стробоскоп",  // задержку починить
                 "Пульсация одним цветом", // возможность извенить цвет
-                "Пульсация со сменой цветов", // удалить
                 "Плавная смена яркости по вертикали (для кольца)",
                 "Безумие красных светодиодов", // возможность извенить цвет
                 "Безумие случайных цветов", // изменение скорости
                 "Белый синий красный бегут по кругу", // изменение скорости
                 "Пульсирует значок радиации",
                 "Красный светодиод бегает по кругу", // вылетает и изменение цвета
-                "Бело синий градиент",
-                "Тоже хрень какая то",
                 "Красные вспышки спускаются вниз", // изменение цвета
-                "Полумесяц", // delete
                 "Эффект пламени",
                 "Радуга в вертикаьной плоскости",
-                "Пакман", // delete
                 "Безумие случайных вспышек",
                 "Полицейская мигалка",
                 "RGB пропеллер", // speed
                 "Случайные вспышки красного в вертикаьной плоскости", // color
                 "Зелёненькие бегают по кругу случайно", // color
                 "Крутая плавная вращающаяся радуга", // speed
-                "Крутая плавная вращающаяся радуга (в обратную сторону)", // delete
-                "Чёт сломалось", // delete
                 "Плавное заполнение цветом", // color
                 "бегающие светодиоды", // color
                 "линейный огонь", // color?
-                "беготня секторов круга (не работает)", // delete
                 "очень плавная вращающаяся радуга", // speed
                 "случайные разноцветные включения",
                 "бегущие огни", // color
                 "случайные вспышки белого цвета", // speed, fix delay
-                "случайные вспышки белого цвета на белом фоне",
-                "бегущие каждые 3 (ЧИСЛО СВЕТОДИОДОВ ДОЛЖНО БЫТЬ НЕЧЁТНОЕ)", // delete
-                "бегущие каждые 3 радуга (ЧИСЛО СВЕТОДИОДОВ ДОЛЖНО БЫТЬ КРАТНО 3)", // delete
-                "бегущие каждые 3 радуга (ЧИСЛО СВЕТОДИОДОВ ДОЛЖНО БЫТЬ КРАТНО 3)", // delete
                 "стробоскоп", // color, speed
-                "прыгающие мячики", // delete
-                "прыгающие мячики цветные" // delete
         };
         ArrayAdapter<String> adapter = new ArrayAdapter(this, android.R.layout.simple_spinner_item, modes);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);

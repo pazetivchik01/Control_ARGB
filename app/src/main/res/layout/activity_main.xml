@@ -114,6 +114,13 @@
                         android:max="255"
                         android:min="0"
                         />
+                    <TextView
+                        android:id="@+id/tvBrightness"
+                        android:textColor="?attr/colorOnSurface"
+                        android:text="0"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content">
+                    </TextView>
                 </LinearLayout>
             <LinearLayout
                 android:layout_width="match_parent"
@@ -135,23 +142,40 @@
 
                 </Spinner>
             </LinearLayout>
+                <LinearLayout
+                    android:id="@+id/speedLinear"
+                    android:visibility="gone"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginTop="8dp">
 
-                <!-- Кнопки режимов -->
-<!--                <com.google.android.material.button.MaterialButton-->
-<!--                    android:id="@+id/btnModeRainbow"-->
-<!--                    style="@style/Widget.Material3.Button.OutlinedButton"-->
-<!--                    android:layout_width="match_parent"-->
-<!--                    android:layout_height="wrap_content"-->
-<!--                    android:layout_marginTop="16dp"-->
-<!--                    android:text="Радуга"/>-->
+                    <TextView
+                        android:textColor="?attr/colorOnSurface"
+                        android:text="Задержка"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content">
 
-<!--                <com.google.android.material.button.MaterialButton-->
-<!--                    android:id="@+id/btnModeStrobe"-->
-<!--                    style="@style/Widget.Material3.Button.OutlinedButton"-->
-<!--                    android:layout_width="match_parent"-->
-<!--                    android:layout_height="wrap_content"-->
-<!--                    android:layout_marginTop="8dp"-->
-<!--                    android:text="Стробоскоп"/>-->
+                    </TextView>
+
+                    <SeekBar
+                        android:id="@+id/seekBarSpeed"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_marginStart="16dp"
+                        android:max="200"
+                        android:min="10"
+                        />
+                    <TextView
+                        android:id="@+id/tvSpeed"
+                        android:textColor="?attr/colorOnSurface"
+                        android:text="10"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content">
+
+                    </TextView>
+                </LinearLayout>
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
     </LinearLayout>
