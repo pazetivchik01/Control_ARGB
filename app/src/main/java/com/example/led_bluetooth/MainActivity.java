@@ -7,12 +7,14 @@ import android.bluetooth.BluetoothSocket;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.SeekBar;
@@ -20,6 +22,7 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
@@ -27,11 +30,15 @@ import androidx.core.content.ContextCompat;
 
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
+
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Set;
 import java.util.UUID;
+
+import me.jfenn.colorpickerdialog.dialogs.ColorPickerDialog;
+import me.jfenn.colorpickerdialog.interfaces.OnColorPickedListener;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -51,6 +58,7 @@ public class MainActivity extends AppCompatActivity {
         speedLinear = findViewById(R.id.speedLinear);
         tvSpeed = findViewById(R.id.tvSpeed);
         tvBrightness = findViewById(R.id.tvBrightness);
+        Button colorPeekBut = findViewById(R.id.peekColorBut);
 
         bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         if (bluetoothAdapter == null) {
@@ -71,21 +79,44 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 try {
-                    if(position == 6 || position == 7 || position == 11 || position == 12 || position == 20 || position == 23 || position == 27 || position == 28 || position == 29 ||position == 30 || position == 32 )
+                    if(position == 8 || position == 9 || position == 13 || position == 14 || position == 22 || position == 25 || position == 29 || position == 30 || position == 31 ||position == 32 || position == 34 )
                         speedLinear.setVisibility(View.VISIBLE);
                     else
                         speedLinear.setVisibility(View.GONE);
+                    if(position == 1)
+                        colorPeekBut.setVisibility(View.VISIBLE);
+                    else
+                        colorPeekBut.setVisibility(View.GONE);
 
-                    sendCommand("!m=" + (position + 2) + ";");
+
+                    sendCommand("!m=" + position + ";");
                 }
                 catch (Exception exception){
                     Toast.makeText(getApplicationContext(), "Произошла ошибка: " + exception.getMessage(), Toast.LENGTH_LONG).show();
+                    closeConnection();
                 }
             }
             @Override
             public void onNothingSelected(AdapterView<?> parent) {
             }
         };
+
+        colorPeekBut.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                new ColorPickerDialog()
+                        .withColor(0) // the default / initial color
+                        .withAlphaEnabled(false)
+                        .withListener(new OnColorPickedListener<ColorPickerDialog>() {
+                            @Override
+                            public void onColorPicked(@Nullable ColorPickerDialog dialog, int color) {
+                                int[] rgb = hexToRgb(String.format("#%06X", color));  // [0, 255, 0]
+                                sendCommand("!c=" + rgb[0] + "," + rgb[1] + "," + rgb[2] + ";");
+                            }
+                        })
+                        .show(getSupportFragmentManager(), "colorPicker");
+            }
+        });
         tvState.setOnClickListener(v -> {
             if (bluetoothSocket != null && bluetoothSocket.isConnected()) {
                 showMessageBox(MainActivity.this,
@@ -227,7 +258,11 @@ public class MainActivity extends AppCompatActivity {
         closeConnection();
     }
     private void initSpinner(){
-        String[] modes = { "Радуга (вся лента)", "Радуга (от начала к концу)",
+        String[] modes = {
+                "Выключенно",
+                "Выбранный цвет",
+                "Радуга (вся лента)",
+                "Радуга (от начала к концу)",
                 "Случайная смена цветов",
                 "Бегающий светодиод (один)",  // возможность извенить цвет
                 "Бегающий светодиод (много)", // возможность извенить цвет
@@ -262,5 +297,17 @@ public class MainActivity extends AppCompatActivity {
         ArrayAdapter<String> adapter = new ArrayAdapter(this, android.R.layout.simple_spinner_item, modes);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         modeLed.setAdapter(adapter);
+    }
+    public static int[] hexToRgb(String hexColor) {
+        hexColor = hexColor.replace("#", "");
+        if (hexColor.length() != 6) {
+            throw new IllegalArgumentException("Цвет должен быть в формате #RRGGBB");
+        }
+
+        int red = Integer.parseInt(hexColor.substring(0, 2), 16);
+        int green = Integer.parseInt(hexColor.substring(2, 4), 16);
+        int blue = Integer.parseInt(hexColor.substring(4, 6), 16);
+
+        return new int[]{red, green, blue};
     }
 }

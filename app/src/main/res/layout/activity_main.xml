@@ -176,6 +176,22 @@
 
                     </TextView>
                 </LinearLayout>
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center">
+                    <Button
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/peekColorBut"
+                        style="@style/Widget.Material3.Button.OutlinedButton"
+                        android:text="Выбор цвета"
+                        android:visibility="gone"
+                        >
+
+                    </Button>
+
+                </LinearLayout>
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
     </LinearLayout>
